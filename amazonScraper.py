@@ -8,7 +8,6 @@ def getAmazonSearchPage(searchTerm):
     resultPage = getHtml(SearchUrlWithSearchTerm)
     return resultPage
 
-
 def scrapeAmazon(searchTerm):
     '''Returns BeautifulSoup formatted html data from Amazon'''
     resultPage = getAmazonSearchPage(searchTerm)
@@ -32,8 +31,7 @@ def thumbnail(soupData, nthItem):
 def categoryList(soupData):
     '''Expects BeautifulSoup formatted html data'''
     categoryLinkParentDiv = soupData.find("div", attrs={"id": "kindOfSort_content"})
-    categoryStringDivs = categoryLinkParentDiv.findAll('li')
-    return categoryStringDivs
+    return categoryLinkParentDiv.findAll('li')
 
 
 def largestCategory(categories):
@@ -57,8 +55,10 @@ def categoryWithoutMarkUp(categoryMarkUp):
     '''Expects a single category (like from nthCategory)'''
     categoryStringDiv = categoryMarkUp.find("span", {"class": "refinementLink"})
     name = categoryStringDiv.string
+
     categoryCountDiv = categoryStringDiv.find_next("span", {"class": "narrowValue"})
     quantity = categoryCountDiv.string
+
     link = categoryMarkUp.find_next('a')['href']
     return link + " " + name + quantity
 
@@ -66,9 +66,8 @@ def categoryWithoutMarkUp(categoryMarkUp):
 def fourStarsAndUp(parentLink):
     '''Expects a link to an Amazon search result page that has been sorted by category'''
     parentPage = soupify(getHtml(parentLink))
-    starLinksOfPage = parentPage.find(text= "Avg. Customer Review").parent
+    starLinksOfPage = parentPage.find(text = "Avg. Customer Review").parent
     return starLinksOfPage.find_next('ul').find_next('li').find_next('a')['href']
-    # After <h2>Avg. Customer Review</h2>, find the first ul, then find the first li, then find the first <a>
 
 def getHtml(url):
     '''Returns html data from a given url'''
@@ -119,6 +118,3 @@ scrape.getFirstItemsCategory()
 scrape.getNthCategory(1)
 print "4 star and up link = " + scrape.get4StarsAndUpFromNthCategory(1)
 # scrape.getCategoryList()
-
-# 4 star and up:
-# After <h2>Avg. Customer Review</h2>, find the first ul, then find the first li, then find the first <a>
