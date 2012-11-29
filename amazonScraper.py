@@ -25,13 +25,27 @@ def thumbnail(soupData, nthItem):
     return firstProductImageDiv.a.img['src']
 
 
-def largestCategory(soupData):
+def categoryList(soupData):
     '''Expects BeautifulSoup formatted html data'''
     categoryLinkParentDiv = soupData.find("div", attrs={"id": "kindOfSort_content"})
-    categoryStringDiv = categoryLinkParentDiv.find("span", {"class": "refinementLink"})
-    print categoryLinkParentDiv
-    categoryCountDiv = categoryStringDiv.find_next("span", {"class": "narrowValue"})
-    return categoryStringDiv.string+" with"+categoryCountDiv.string+" results."
+    categoryStringDivs = categoryLinkParentDiv.findAll('li')
+    return categoryStringDivs
+
+
+def largestCategory(categories):
+    '''Expects a list of categories from amazonScrape'''
+    if categories:
+        for item in categories:
+            return item
+    return "There are no categories in this list."
+
+
+def nthCategory(categories, nthItem):
+    '''Expects a list of categories from amazonScrape and an int
+    representing which category you would like to return'''
+    if nthItem > len(categories):
+        return "Your nth value is too large for the number of categories in the list."
+    return categories[nthItem - 1]
 
 
 class amazonScrape:
@@ -39,6 +53,7 @@ class amazonScrape:
     can return the image of the first search result'''
     def __init__(self, searchTerm):
         self.resultData = scrapeAmazon(searchTerm)
+        self.categories = categoryList(self.resultData)
 
     def getData(self):
         return self.resultData
@@ -49,7 +64,15 @@ class amazonScrape:
 
     def getFirstItemsCategory(self):
         """Returns the first search result's largest category"""
-        print largestCategory(self.resultData)
+        print largestCategory(self.categories)
+
+    def getCategoryList(self):
+        '''Returns list of all categories'''
+        print self.categories
+
+    def getNthCategory(self, nthItem):
+        '''Returns nth category'''
+        print nthCategory(self.categories, nthItem)
 
 
 ##### Example output
@@ -57,20 +80,11 @@ userInput = raw_input('Enter a search term: ')
 scrape = amazonScrape(userInput)
 scrape.getImage(1)
 scrape.getFirstItemsCategory()
+scrape.getNthCategory(2)
+# scrape.getCategoryList()
 
 
 
-#### notes
-# <div id="kindOfSort_content"
-# <ul>
-# <li>
-# follow the first <a href> tag
-# the <span class="childRefinementLink">Electronics</span> right under the <a>
-#     tag contains the name of the category
-
-# Given "apple" - the link should be "http://www.amazon.com/s/ref=sr_nr_i_0?rh=k%3Aapple%2Ci%3Aelectronics&keywords=apple&ie=UTF8&qid=1354192313"
-# or "s/ref=sr_nr_i_0?rh=k%3Aapple%2Ci%3Aelectronics&keywords=apple&ie=UTF8&qid=1354192313" in Electronics
-# I can take out the "ref=sr_nr_i_0"
 
 
 
